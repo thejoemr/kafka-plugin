@@ -2,19 +2,42 @@
 
 namespace kafka_plugin
 {
+    /// <summary>
+    /// Expone la funcionalidad de un consumidor de colas de mensaje
+    /// </summary>
     public class Consumer
     {
+        /// <summary>
+        /// Configuración del componente
+        /// </summary>
         public ConsumerConfig ConsumerConfig { get; }
+        /// <summary>
+        /// Dirección del servidor kafka
+        /// </summary>
         public string Server { get; }
 
         public delegate void MessageReceived(string topic, string message);
         public delegate void Error(string topic, Exception e);
         public delegate void Disconect(string topic);
 
+        /// <summary>
+        /// Se dispara cada vez que una <strong>Queue</strong> recibe un mensaje
+        /// </summary>
         public event MessageReceived ?OnMessageReceived;
+        /// <summary>
+        /// Se dispara cada vez que una <strong>Queue</strong> genera un mensaje
+        /// </summary>
         public event Error? OnError;
+        /// <summary>
+        /// Se dispara cada vez que una <strong>Queue</strong> se desconecta
+        /// </summary>
         public event Disconect? OnDisconect;
 
+        /// <summary>
+        /// Crea un nuevo consumidor de colas de mensaje
+        /// </summary>
+        /// <param name="server">Url del servidor Kafka</param>
+        /// <param name="groupId">Identificador del consumidor</param>
         public Consumer(string server, string groupId)
         {
             ConsumerConfig = new ConsumerConfig
@@ -32,6 +55,11 @@ namespace kafka_plugin
             Server = server;
         }
 
+        /// <summary>
+        /// Se suscribe a una <strong>Queue</strong> para recibir mensajes
+        /// </summary>
+        /// <param name="topic">Nombre de la Queue de mensajes</param>
+        /// <param name="stoppingToken">Token de cancelación</param>
         public void StartReceivingMessages(string topic, CancellationToken stoppingToken = default)
         {
             using var consumer = new ConsumerBuilder<Ignore, string>(ConsumerConfig)

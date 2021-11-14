@@ -2,17 +2,36 @@
 using System.Net;
 
 namespace kafka_plugin;
+/// <summary>
+/// Expone la funcionalidad de un productor de mensajes
+/// </summary>
 public class Producer
 {
-    public string Server { get; }
+    /// <summary>
+     /// Configuración del componente
+     /// </summary>
     public ProducerConfig ProducerConfig { get; }
+    /// <summary>
+    /// Dirección del servidor kafka
+    /// </summary>
+    public string Server { get; }
 
     public delegate void DeliveryMessage(string topic, string message);
     public delegate void Error(string topic, Exception e);
 
+    /// <summary>
+    /// Se dispara a lo largo del proceso de envio de un mensaje
+    /// </summary>
     public event DeliveryMessage? OnDeliveryMessage;
+    /// <summary>
+    /// Se dispara si el posteo a la <strong>Queue</strong> generó un error
+    /// </summary>
     public event Error? OnError;
 
+    /// <summary>
+    /// Crea un nuevo productor de mensajes
+    /// </summary>
+    /// <param name="server">Url del servidor Kafka</param>
     public Producer(string server)
     {
         ProducerConfig = new ProducerConfig
@@ -35,6 +54,12 @@ public class Producer
         Server = server;
     }
 
+    /// <summary>
+    /// Publica un mensaje en la <strong>Queue</strong> especificada
+    /// </summary>
+    /// <param name="topic">Nombre de la Queue de mensajes</param>
+    /// <param name="message">Mensaje a enviar</param>
+    /// <returns></returns>
     public async Task<bool> PostAsync(string topic, string message)
     {
         using var producer = new ProducerBuilder<long, string>(ProducerConfig)
