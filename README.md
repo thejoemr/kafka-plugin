@@ -59,9 +59,9 @@ void OnDeliveryMessage(string topic, string message)
 - Ejecución de los productores en hilos independientes
 ```
 DateTime now = DateTime.Now;
-DateTime firstRun = now.AddMinutes(1);
+DateTime firstRun = now.AddSeconds(5);
 
-TimeSpan timeToGo = (firstRun - now) <= TimeSpan.Zero ? TimeSpan.Zero : firstRun - now;
+TimeSpan timeToGo = firstRun - now;
 
 new Timer(async (x) =>
 {
