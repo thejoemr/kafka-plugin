@@ -1,5 +1,5 @@
 # kafka-plugin
-## Plugin de integración con Apache Kafka
+Plugin de integración con Apache Kafka
 > Agregar referencia al espacio de nombres
 ```
 using kafka_plugin;
