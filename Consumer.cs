@@ -1,4 +1,7 @@
 ﻿using Confluent.Kafka;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace kafka_plugin
 {
@@ -61,6 +64,16 @@ namespace kafka_plugin
         /// <param name="topic">Nombre de la Queue de mensajes</param>
         /// <param name="stoppingToken">Token de cancelación</param>
         public void StartReceivingMessages(string topic, CancellationToken stoppingToken = default)
+        {
+            Task.Factory.StartNew(() => ReceivingMessages(topic, stoppingToken), stoppingToken);
+        }
+
+        /// <summary>
+        /// Se suscribe a una <strong>Queue</strong> para recibir mensajes
+        /// </summary>
+        /// <param name="topic">Nombre de la Queue de mensajes</param>
+        /// <param name="stoppingToken">Token de cancelación</param>
+        void ReceivingMessages(string topic, CancellationToken stoppingToken = default)
         {
             using var consumer = new ConsumerBuilder<Ignore, string>(ConsumerConfig)
                 .SetValueDeserializer(Deserializers.Utf8)
