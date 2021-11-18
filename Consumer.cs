@@ -88,12 +88,15 @@ namespace kafka_plugin
                 {
                     ConsumeResult<Ignore, string> result = consumer.Consume(TimeSpan.FromMilliseconds(ConsumerConfig.MaxPollIntervalMs - 1000 ?? 250000));
 
-                    string message = result.Message.Value;
+                    string? message = result?.Message?.Value;
 
                     consumer.Commit(result);
                     consumer.StoreOffset(result);
 
-                    OnMessageReceived?.Invoke(topic, message);
+                    if (message is not null)
+                    {
+                        OnMessageReceived?.Invoke(topic, message);
+                    }
                 }
             }
             catch (Exception e)
