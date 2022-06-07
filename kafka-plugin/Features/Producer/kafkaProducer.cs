@@ -14,27 +14,19 @@ namespace kafka_plugin.Features.Producer
 
         public async Task<DeliveryResult<long, string>> ProduceAsync(string topic, string message, CancellationToken cancellationToken = default)
         {
-            using (var producer = new ProducerBuilder<long, string>(Configuration)
+            using var producer = new ProducerBuilder<long, string>(Configuration)
                 .SetKeySerializer(Serializers.Int64)
                 .SetValueSerializer(Serializers.Utf8)
                 .SetLogHandler((_, logMsg) => OnLogEntry?.Invoke(topic, logMsg))
-                .Build())
-            {
-                try
-                {
-                    Message<long, string> messageData = new()
-                    {
-                        Key = DateTime.UtcNow.Ticks,
-                        Value = message
-                    };
+                .Build();
 
-                    return await producer.ProduceAsync(topic, messageData);
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
+            Message<long, string> messageData = new()
+            {
+                Key = DateTime.UtcNow.Ticks,
+                Value = message
+            };
+
+            return await producer.ProduceAsync(topic, messageData, cancellationToken);
         }
     }
 }

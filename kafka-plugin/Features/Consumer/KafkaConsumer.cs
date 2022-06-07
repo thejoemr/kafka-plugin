@@ -63,17 +63,17 @@ namespace kafka_plugin.Features.Consumer
                 .SetLogHandler((_, logMsg) => OnLogEntry?.Invoke(topic, logMsg))
                 .Build();
 
-            consumer.Subscribe(topic);
+            string message = string.Empty;
 
+            consumer.Subscribe(topic);
             var result = consumer.Consume(cancellationToken);
             if (result != null)
             {
-                return result.Message.Value;
+                message = result.Message.Value;
             }
-
             consumer.Close();
 
-            return string.Empty;
+            return message;
         }
     }
 }
