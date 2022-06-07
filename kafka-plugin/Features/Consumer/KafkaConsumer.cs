@@ -26,39 +26,16 @@ namespace kafka_plugin.Features.Consumer
             {
                 try
                 {
-                    Consume(topic, cancellationToken);
-                }
-                catch (Exception)
-                {
-                    break;
-                }
-            }
-        }, cancellationToken);
-
-        public string Consume(string topic, CancellationToken cancellationToken = default)
-        {
-            using (var consumer = new ConsumerBuilder<Ignore, string>(Configuration)
-                .SetValueDeserializer(Deserializers.Utf8)
-                .SetLogHandler((_, logMsg) => OnLogEntry?.Invoke(topic, logMsg))
-                .Build())
-            {
-                string message = string.Empty;
-
-                try
-                {
-                    consumer.Subscribe(topic);
-                    var result = consumer.Consume(cancellationToken);
-                    if(result != null)
+                    string message = Consume(topic, cancellationToken);
+                    if (!string.IsNullOrEmpty(message))
                     {
-                        message = result.Message.Value;
                         OnMessageEntry?.Invoke(topic, message);
-                        return message;
                     }
                 }
-                catch(ConsumeException e)
+                catch (ConsumeException e)
                 {
                     //  Se detiene el consumo del topico si el error es fatal
-                    if(e.Error.IsFatal)
+                    if (e.Error.IsFatal)
                     {
                         var logMsg = new LogMessage("KafkaConsumer", SyslogLevel.Critical, "ConsumerAsync", e.Message);
                         OnLogEntry?.Invoke(topic, logMsg);
@@ -70,19 +47,33 @@ namespace kafka_plugin.Features.Consumer
                         OnLogEntry?.Invoke(topic, logMsg);
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     var logMsg = new LogMessage("KafkaConsumer", SyslogLevel.Critical, "ConsumerAsync", e.Message);
                     OnLogEntry?.Invoke(topic, logMsg);
                     throw;
                 }
-                finally
-                {
-                    consumer.Close();
-                }
-
-                return message;
             }
+        }, cancellationToken);
+
+        public string Consume(string topic, CancellationToken cancellationToken = default)
+        {
+            using var consumer = new ConsumerBuilder<Ignore, string>(Configuration)
+                .SetValueDeserializer(Deserializers.Utf8)
+                .SetLogHandler((_, logMsg) => OnLogEntry?.Invoke(topic, logMsg))
+                .Build();
+
+            consumer.Subscribe(topic);
+
+            var result = consumer.Consume(cancellationToken);
+            if (result != null)
+            {
+                return result.Message.Value;
+            }
+
+            consumer.Close();
+
+            return string.Empty;
         }
     }
 }
