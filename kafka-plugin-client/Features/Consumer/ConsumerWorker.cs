@@ -35,6 +35,7 @@ class ConsumerWorker : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-        await _consumer.ConsumeAsync(_configuration["kafka:Topic"], stoppingToken);
+        string topic = _configuration["kafka:Topic"];
+        await _consumer.ConsumeAsync(topic, stoppingToken);
     }
 }

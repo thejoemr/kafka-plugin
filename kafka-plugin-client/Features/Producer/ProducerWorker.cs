@@ -28,11 +28,22 @@ public class ProducerWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (true)
+        while (!stoppingToken.IsCancellationRequested)
         {
+            var topic = _configuration["kafka:Topic"];
             var message = string.Format("Worker running at: {0}", DateTimeOffset.Now);
-            await _producer.ProduceAsync(_configuration["kafka:Topic"], message, stoppingToken);
-            await Task.Delay(2000, stoppingToken);
+            var result = await _producer.ProduceAsync(topic, message, stoppingToken);
+
+            if (result.Status == PersistenceStatus.Persisted)
+            {
+                _logger.LogInformation($"{topic} - Message sent");
+            }
+            else
+            {
+                _logger.LogCritical($"{topic} - Message not sent");
+            }
+
+            await Task.Delay(3000, stoppingToken);
         }
     }
 }
