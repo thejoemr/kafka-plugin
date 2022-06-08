@@ -43,7 +43,8 @@ public class ProducerWorker : BackgroundService
                 _logger.LogCritical($"{topic} - Message not sent");
             }
 
-            await Task.Delay(3000, stoppingToken);
+            var delay = _configuration.GetValue<int>("kafka:ProducerDelay");
+            await Task.Delay(delay, stoppingToken);
         }
     }
 }

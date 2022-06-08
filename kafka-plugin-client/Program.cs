@@ -16,7 +16,8 @@ IHost host = Host.CreateDefaultBuilder(args)
                 BootstrapServers = configuration["kafka:Brokers"],
                 ClientId = Dns.GetHostName(),
             };
-            
+
+            // Puedes hacer tu configuración con un Diccionario y pasarlo en el constructor de un objecto [ProducerConfig]
             return new KafkaProducer(config);
         });
 
@@ -28,7 +29,8 @@ IHost host = Host.CreateDefaultBuilder(args)
                 ClientId = Dns.GetHostName(),
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
-            
+
+            // Puedes hacer tu configuración con un Diccionario y pasarlo en el constructor de un objecto [ProducerConfig]
             return new KafkaConsumer(config);
         });
 
