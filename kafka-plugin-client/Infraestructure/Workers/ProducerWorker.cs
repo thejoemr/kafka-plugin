@@ -1,7 +1,7 @@
 using Confluent.Kafka;
 using kafka_plugin.Features.Producer;
 
-namespace kafka_plugin_client.Features.Producer;
+namespace kafka_plugin_client.Infraestructure.Workers;
 
 public class ProducerWorker : BackgroundService
 {
@@ -30,7 +30,7 @@ public class ProducerWorker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var topic = _configuration["kafka:Topic"];
+            var topic = Environment.GetEnvironmentVariable("KAFKA_TOPIC") ?? string.Empty;
             var message = string.Format("Worker running at: {0}", DateTimeOffset.Now);
             var result = await _producer.ProduceAsync(topic, message, stoppingToken);
 
@@ -43,8 +43,7 @@ public class ProducerWorker : BackgroundService
                 _logger.LogCritical($"{topic} - Message not sent");
             }
 
-            var delay = _configuration.GetValue<int>("kafka:ProducerDelay");
-            await Task.Delay(delay, stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
         }
     }
 }

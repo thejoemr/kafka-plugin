@@ -1,7 +1,7 @@
 using Confluent.Kafka;
 using kafka_plugin.Features.Consumer;
 
-namespace kafka_plugin_client.Features.Consumer;
+namespace kafka_plugin_client.Infraestructure.Workers;
 
 class ConsumerWorker : BackgroundService
 {
@@ -35,7 +35,7 @@ class ConsumerWorker : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-        string topic = _configuration["kafka:Topic"];
+        var topic = Environment.GetEnvironmentVariable("KAFKA_TOPIC") ?? string.Empty;
         await _consumer.ConsumeAsync(topic, stoppingToken);
     }
 }

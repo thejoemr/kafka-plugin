@@ -26,6 +26,8 @@ namespace kafka_plugin.Features.Producer
                 Value = message
             };
 
+            Console.WriteLine(topic);
+
             return await producer.ProduceAsync(topic, messageData, cancellationToken);
         }
     }
