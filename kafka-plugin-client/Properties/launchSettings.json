@@ -4,7 +4,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {
-        "KAFKA_BROKER": "broker:9092",
+        "KAFKA_BROKER": "localhost:9092",
         "KAFKA_GROUPID": "Test",
         "KAFKA_TOPIC": "Test",
         "DOTNET_ENVIRONMENT": "Development"
